@@ -26,8 +26,8 @@ describe('App', () => {
 
   it('renders chat interface', () => {
     render(<App />);
-    expect(screen.getByText('AI Chat')).toBeInTheDocument();
-    expect(screen.getByText('Start a conversation')).toBeInTheDocument();
+    expect(screen.getByText('AndreasGPT')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Type your message...')).toBeInTheDocument();
   });
 
   it('displays user message after sending', async () => {
@@ -41,23 +41,6 @@ describe('App', () => {
     await waitFor(() => {
       expect(screen.getByText('Hello')).toBeInTheDocument();
     });
-  });
-
-  it('clears messages when clear button is clicked', async () => {
-    render(<App />);
-
-    fireEvent.change(screen.getByPlaceholderText('Type your message...'), {
-      target: { value: 'Hello' }
-    });
-    fireEvent.click(screen.getByText('Send'));
-
-    await waitFor(() => {
-      expect(screen.getByText('Hello')).toBeInTheDocument();
-    });
-
-    fireEvent.click(screen.getByText('Clear'));
-
-    expect(screen.getByText('Start a conversation')).toBeInTheDocument();
   });
 
   it('disables input while loading', async () => {

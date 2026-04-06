@@ -1,4 +1,4 @@
-# AI Chat
+# AndreasGPT
 
 A lightweight AI chat application powered by Google Gemini.
 

@@ -9,6 +9,11 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const stopStream = useRef(null);
+  const messagesEndRef = useRef(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
   useEffect(() => {
     const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
@@ -42,29 +47,20 @@ function App() {
     }
   };
 
-  const handleClear = () => {
-    stopStream.current?.();
-    setMessages([]);
-    setIsLoading(false);
-  };
-
-  if (error) {
+if (error) {
     return <div><p>{error}</p></div>;
   }
 
   return (
     <div>
       <header>
-        <h1>AI Chat</h1>
-        <button onClick={handleClear}>Clear</button>
+        <h1>AndreasGPT</h1>
       </header>
 
       <main>
-        {messages.length === 0 ? (
-          <p>Start a conversation</p>
-        ) : (
-          messages.map((msg, i) => <ChatMessage key={i} message={msg} />)
-        )}
+        {messages.map((msg, i) => <ChatMessage key={i} message={msg} />)}
+        {isLoading && <div className="loading"><span></span><span></span><span></span></div>}
+        <div ref={messagesEndRef} />
       </main>
 
       <footer>
