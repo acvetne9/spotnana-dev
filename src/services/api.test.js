@@ -1,16 +1,17 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { initChat, sendMessage, streamText } from './api';
 
-// Mock LangChain
-vi.mock('@langchain/google-genai', () => ({
-  ChatGoogleGenerativeAI: vi.fn().mockImplementation(() => ({
-    invoke: vi.fn().mockResolvedValue({ content: 'Hello from AI' })
+// Mock Google Generative AI
+vi.mock('@google/generative-ai', () => ({
+  GoogleGenerativeAI: vi.fn().mockImplementation(() => ({
+    getGenerativeModel: vi.fn().mockReturnValue({
+      startChat: vi.fn().mockReturnValue({
+        sendMessage: vi.fn().mockResolvedValue({
+          response: { text: () => 'Hello from AI' }
+        })
+      })
+    })
   }))
-}));
-
-vi.mock('@langchain/core/messages', () => ({
-  HumanMessage: vi.fn().mockImplementation((content) => ({ role: 'user', content })),
-  AIMessage: vi.fn().mockImplementation((content) => ({ role: 'assistant', content }))
 }));
 
 describe('api', () => {
@@ -26,16 +27,14 @@ describe('api', () => {
 
   describe('sendMessage', () => {
     it('throws error if chat not initialized', async () => {
-      // Reset module to clear model
       vi.resetModules();
       const { sendMessage: freshSendMessage } = await import('./api');
-
-      await expect(freshSendMessage('hello', [])).rejects.toThrow('Set API key first');
+      await expect(freshSendMessage('hello')).rejects.toThrow('Set API key first');
     });
 
     it('returns response from AI', async () => {
       initChat('test-key');
-      const response = await sendMessage('hello', []);
+      const response = await sendMessage('hello');
       expect(response).toBe('Hello from AI');
     });
   });

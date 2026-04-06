@@ -24,7 +24,7 @@ function App() {
     setIsLoading(true);
 
     try {
-      const response = await sendMessage(content, messages);
+      const response = await sendMessage(content);
       setMessages(prev => [...prev, { role: 'assistant', content: '' }]);
 
       let text = '';

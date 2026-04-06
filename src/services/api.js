@@ -1,22 +1,17 @@
-import { ChatGoogleGenerativeAI } from '@langchain/google-genai';
-import { HumanMessage, AIMessage } from '@langchain/core/messages';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
-let model = null;
+let chat = null;
 
 export function initChat(apiKey) {
-  model = new ChatGoogleGenerativeAI({ apiKey, model: 'gemini-2.0-flash' });
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+  chat = model.startChat();
 }
 
-export async function sendMessage(message, history) {
-  if (!model) throw new Error('Set API key first');
-
-  const messages = history.map(m =>
-    m.role === 'user' ? new HumanMessage(m.content) : new AIMessage(m.content)
-  );
-  messages.push(new HumanMessage(message));
-
-  const response = await model.invoke(messages);
-  return response.content;
+export async function sendMessage(message) {
+  if (!chat) throw new Error('Set API key first');
+  const result = await chat.sendMessage(message);
+  return result.response.text();
 }
 
 export function streamText(text, onChar, onDone) {
