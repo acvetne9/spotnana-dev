@@ -16,47 +16,23 @@ vi.mock('./services/api', () => ({
   })
 }));
 
+// Mock environment variable
+vi.stubEnv('VITE_GEMINI_API_KEY', 'test-api-key');
+
 describe('App', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('renders API key input initially', () => {
+  it('renders chat interface', () => {
     render(<App />);
-    expect(screen.getByText('Enter Gemini API Key')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('API key...')).toBeInTheDocument();
-  });
-
-  it('shows chat interface after setting API key', () => {
-    render(<App />);
-
-    fireEvent.change(screen.getByPlaceholderText('API key...'), {
-      target: { value: 'test-key' }
-    });
-    fireEvent.click(screen.getByText('Start'));
-
     expect(screen.getByText('AI Chat')).toBeInTheDocument();
     expect(screen.getByText('Start a conversation')).toBeInTheDocument();
-  });
-
-  it('does not proceed with empty API key', () => {
-    render(<App />);
-
-    fireEvent.click(screen.getByText('Start'));
-
-    expect(screen.getByText('Enter Gemini API Key')).toBeInTheDocument();
   });
 
   it('displays user message after sending', async () => {
     render(<App />);
 
-    // Set API key
-    fireEvent.change(screen.getByPlaceholderText('API key...'), {
-      target: { value: 'test-key' }
-    });
-    fireEvent.click(screen.getByText('Start'));
-
-    // Send message
     fireEvent.change(screen.getByPlaceholderText('Type your message...'), {
       target: { value: 'Hello' }
     });
@@ -70,13 +46,6 @@ describe('App', () => {
   it('clears messages when clear button is clicked', async () => {
     render(<App />);
 
-    // Set API key
-    fireEvent.change(screen.getByPlaceholderText('API key...'), {
-      target: { value: 'test-key' }
-    });
-    fireEvent.click(screen.getByText('Start'));
-
-    // Send message
     fireEvent.change(screen.getByPlaceholderText('Type your message...'), {
       target: { value: 'Hello' }
     });
@@ -86,9 +55,22 @@ describe('App', () => {
       expect(screen.getByText('Hello')).toBeInTheDocument();
     });
 
-    // Clear
     fireEvent.click(screen.getByText('Clear'));
 
     expect(screen.getByText('Start a conversation')).toBeInTheDocument();
+  });
+
+  it('disables input while loading', async () => {
+    render(<App />);
+
+    fireEvent.change(screen.getByPlaceholderText('Type your message...'), {
+      target: { value: 'Hello' }
+    });
+    fireEvent.click(screen.getByText('Send'));
+
+    // Input should be disabled during loading
+    await waitFor(() => {
+      expect(screen.getByPlaceholderText('Type your message...')).toBeDisabled();
+    });
   });
 });

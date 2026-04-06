@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import ChatMessage from './components/ChatMessage';
 import ChatInput from './components/ChatInput';
 import { initChat, sendMessage, streamText } from './services/api';
@@ -6,17 +6,18 @@ import './App.css';
 
 function App() {
   const [messages, setMessages] = useState([]);
-  const [apiKey, setApiKey] = useState('');
-  const [isReady, setIsReady] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
   const stopStream = useRef(null);
 
-  const handleSetKey = () => {
-    if (apiKey.trim()) {
-      initChat(apiKey.trim());
-      setIsReady(true);
+  useEffect(() => {
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+    if (apiKey) {
+      initChat(apiKey);
+    } else {
+      setError('Missing API key. Add VITE_GEMINI_API_KEY to .env file.');
     }
-  };
+  }, []);
 
   const handleSend = async (content) => {
     setMessages(prev => [...prev, { role: 'user', content }]);
@@ -47,19 +48,8 @@ function App() {
     setIsLoading(false);
   };
 
-  if (!isReady) {
-    return (
-      <div>
-        <h2>Enter Gemini API Key</h2>
-        <input
-          type="password"
-          value={apiKey}
-          onChange={e => setApiKey(e.target.value)}
-          placeholder="API key..."
-        />
-        <button onClick={handleSetKey}>Start</button>
-      </div>
-    );
+  if (error) {
+    return <div><p>{error}</p></div>;
   }
 
   return (
