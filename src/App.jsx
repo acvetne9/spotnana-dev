@@ -47,7 +47,13 @@ function App() {
     }
   };
 
-if (error) {
+const handleClear = () => {
+    stopStream.current?.();
+    setMessages([]);
+    setIsLoading(false);
+  };
+
+  if (error) {
     return <div><p>{error}</p></div>;
   }
 
@@ -64,7 +70,7 @@ if (error) {
       </main>
 
       <footer>
-        <ChatInput onSend={handleSend} disabled={isLoading} />
+        <ChatInput onSend={handleSend} onClear={handleClear} disabled={isLoading} />
       </footer>
     </div>
   );

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-function ChatInput({ onSend, disabled }) {
+function ChatInput({ onSend, onClear, disabled }) {
   const [input, setInput] = useState('');
 
   const handleSubmit = (e) => {
@@ -21,6 +21,7 @@ function ChatInput({ onSend, disabled }) {
         disabled={disabled}
       />
       <button type="submit" disabled={disabled || !input.trim()}>Send</button>
+      <button type="button" className="clear-btn" onClick={onClear}>Clear</button>
     </form>
   );
 }
